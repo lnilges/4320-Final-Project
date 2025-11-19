@@ -66,24 +66,26 @@ def admin():
 #route to get to reservations page
 #will have a form where users can enter first name, last name, seat row, and seat column
 #will then display a reservation code one reservation is made
-@app.route('/reservations', methods=('GET', 'POST'))
-def reservations():
-    return render_template('reservations.html')
+@app.route('/reservation', methods=('GET', 'POST'))
+def reservation():
+    return render_template('reservation.html')
 
  
 @app.route('/', methods=('GET', 'POST'))
 def index():
     choice = request.form.get('user_choice')
 
-    if not choice:
-        flash("ERROR: Must choose an option.")
-        return(redirect(url_for('index')))
-    
-    if choice == "admin":
-        return render_template('admin.html')
-    if choice == "reservation":
-        return render_template('reservation.html')
-    else:
-        return redirect((url_for('index')))
+    if request.method == "POST":
+        if not choice:
+            flash("ERROR: Must choose an option.")
+            return(redirect(url_for('index')))
+        
+        if choice == "admin":
+            return render_template('admin.html')
+        if choice == "reservation":
+            return render_template('reservation.html')
+        else:
+            return redirect((url_for('index')))
+    return render_template('index.html')
 
 app.run() 

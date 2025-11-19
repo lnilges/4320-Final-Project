@@ -45,7 +45,7 @@
     <nav>
         <a href="{{ url_for('index') }}">Home</a>
         <a href="{{ url_for('admin') }}">Admin</a>
-        <a href="{{ url_for('reservations') }}">Reservations</a>
+        <a href="{{ url_for('reservation') }}">Reservations</a>
     </nav>
     <div class="content">
         {% for message in get_flashed_messages() %}
