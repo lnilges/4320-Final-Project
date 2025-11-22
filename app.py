@@ -45,9 +45,31 @@ def get_db_connection():
     return conn
 
 #function to get admin login information from database
-
+def admin_info():
+    pass
 
 #function to get reservation information from database
+def get_reservations():
+    pass
+
+#function to get seat rows/columns to make chart to display in reservation page
+def get_seating_chart():
+    conn = get_db_connection()
+    query = "SELECT seatRow, seatColumn from reservations"
+    seats = conn.execute(query).fetchall()
+    conn.close()
+
+    rows = 12
+    columns = 4
+
+    chart = [['O' for _ in range(columns)] for _ in range(rows)]
+
+    for seat in seats:
+        row = seat['seatRow']
+        column = seat['seatColumn']
+        chart[row][column] = 'X'
+
+    return chart
 
 #function to generate cost matrix for flights
 #input: none
@@ -58,17 +80,51 @@ def get_cost_matrix():
 
 
 #route to get to admin page 
-#will display seating chart, total sales, and reservation list with delete button
+    #will display seating chart, total sales, and reservation list with delete button
 @app.route('/admin', methods=('GET', 'POST'))
 def admin():
    return render_template('admin.html')
 
 #route to get to reservations page
-#will have a form where users can enter first name, last name, seat row, and seat column
-#will then display a reservation code one reservation is made
+    #will have a form where users can enter first name, last name, seat row, and seat column
+    #will then display a reservation code one reservation is made
 @app.route('/reservation', methods=('GET', 'POST'))
 def reservation():
-    return render_template('reservation.html')
+    seating_chart = get_seating_chart()
+    first_name = None
+    last_name = None
+    seat_row = None
+    seat_column = None
+
+    if request.method == 'POST':
+        #get first name from form
+        first_name = request.form['first_name']
+        if not first_name:
+            flash('ERROR: Must enter first name')
+
+        #get last name from form
+        last_name = request.form['last_name']
+        if not last_name:
+            flash('ERROR: Must enter first name')
+
+        #get seat row from form
+        seat_row = request.form['seat_row']
+        if not seat_row:
+            flash('ERROR: Must select a row')
+        
+        #get seat column from form
+        seat_column = request.form['seat_column']
+        if not seat_column:
+            flash('ERROR: Must select a seat')
+        
+    #check to see if seat is already booked
+
+    #make ticket number, combination of first name and infotc4320, alternating letters
+
+    #add reservation to the database
+        
+
+    return render_template('reservation.html', seating_chart=seating_chart)
 
  
 @app.route('/', methods=('GET', 'POST'))
