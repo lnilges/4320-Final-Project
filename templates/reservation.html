@@ -5,14 +5,16 @@
     <hr>
     <!--Displays reservation success message once user successfully makes reservation-->
     <!--Need to fix so that it only shows after a user makes a reservation-->
-    <p>Congratulations {{ first_name }}! Row: {{ seat_row }}, Seat: {{ seat_column }} is now reserved for you. Enjoy your trip!</p>
-    <p>Your eTicket number is: {{ reservation_code }}</p>
+    {% if reservation_code %}
+        <p>Congratulations {{ first_name }}! Row: {{ seat_row }}, Seat: {{ seat_column }} is now reserved for you. Enjoy your trip!</p>
+        <p>Your eTicket number is: {{ reservation_code }}</p>
+    {% endif %}
 
     <!--Displays flight chart-->
     <!--Need to fix styling on seating chart-->
     <h2>Seating Chart</h2>
     <p>X = Reserved Seat : O = Available Seat</p>
-    <div style="background-color:darkgrey;">
+    <div class="card">
         {% for row in seating_chart %}
             <div>{{ row }}</div>
         {% endfor %}

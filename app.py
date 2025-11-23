@@ -145,10 +145,10 @@ def reservation():
 
 
         #add reservation to the database
-        #conn = get_db_connection()
-        #conn.execute('INSERT INTO reservations (passengerName, seatRow, seatColumn, eTicketNumber) VALUES (?, ?, ?, ?)', (first_name, seat_row, seat_column, reservation_code))
-        #conn.commit()
-        #conn.close()
+        conn = get_db_connection()
+        conn.execute('INSERT INTO reservations (passengerName, seatRow, seatColumn, eTicketNumber) VALUES (?, ?, ?, ?)', (first_name, seat_row , seat_column, reservation_code))
+        conn.commit()
+        conn.close()
         
 
     return render_template('reservation.html', seating_chart=seating_chart, first_name=first_name, reservation_code=reservation_code, seat_row=seat_row, seat_column=seat_column)
