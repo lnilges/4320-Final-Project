@@ -95,6 +95,7 @@ def reservation():
     last_name = None
     seat_row = None
     seat_column = None
+    reservation_code = None
 
     if request.method == 'POST':
         #get first name from form
@@ -117,14 +118,18 @@ def reservation():
         if not seat_column:
             flash('ERROR: Must select a seat')
         
-    #check to see if seat is already booked
+        #check to see if seat is already booked
 
-    #make ticket number, combination of first name and infotc4320, alternating letters
 
-    #add reservation to the database
+        #make reservation code, combination of first name and infotc4320, alternating letters
+        reservation_str = 'infotc4320'
+        reservation_code = ''.join(map(''.join, zip(first_name, reservation_str)))
+
+
+        #add reservation to the database
         
 
-    return render_template('reservation.html', seating_chart=seating_chart)
+    return render_template('reservation.html', seating_chart=seating_chart, first_name=first_name, reservation_code=reservation_code)
 
  
 @app.route('/', methods=('GET', 'POST'))
