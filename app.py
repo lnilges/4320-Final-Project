@@ -71,6 +71,27 @@ def get_seating_chart():
 
     return chart
 
+#function to get reservation code
+def get_reservation_code(first_name):
+    i = j = 0
+    reservation_str = "infotc4320"
+    reservation_code = ""
+
+    while i < len(first_name) and j < len(reservation_str):
+        reservation_code += first_name[i] + reservation_str[j]
+        i += 1
+        j += 1
+
+    while i < len(first_name):
+        reservation_code += first_name[i]
+        i += 1
+
+    while j < len(reservation_str):
+        reservation_code += reservation_str[j]
+        j += 1
+
+    return reservation_code
+
 #function to generate cost matrix for flights
 #input: none
 #output: returns a 12 x 4 matrix of prices
@@ -117,19 +138,20 @@ def reservation():
         seat_column = request.form['seat_column']
         if not seat_column:
             flash('ERROR: Must select a seat')
-        
-        #check to see if seat is already booked
-
 
         #make reservation code, combination of first name and infotc4320, alternating letters
-        reservation_str = 'infotc4320'
-        reservation_code = ''.join(map(''.join, zip(first_name, reservation_str)))
+        #****Fix this - if one string is longer, does not finish longer string
+        reservation_code = get_reservation_code(first_name)        
 
 
         #add reservation to the database
+        #conn = get_db_connection()
+        #conn.execute('INSERT INTO reservations (passengerName, seatRow, seatColumn, eTicketNumber) VALUES (?, ?, ?, ?)', (first_name, seat_row, seat_column, reservation_code))
+        #conn.commit()
+        #conn.close()
         
 
-    return render_template('reservation.html', seating_chart=seating_chart, first_name=first_name, reservation_code=reservation_code)
+    return render_template('reservation.html', seating_chart=seating_chart, first_name=first_name, reservation_code=reservation_code, seat_row=seat_row, seat_column=seat_column)
 
  
 @app.route('/', methods=('GET', 'POST'))
