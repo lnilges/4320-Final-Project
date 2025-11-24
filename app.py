@@ -52,7 +52,7 @@ def admin_info():
 def get_reservations():
     pass
 
-#function to get seat rows/columns to make chart to display in reservation page
+#function to get seat rows/columns to make chart to display
 def get_seating_chart():
     conn = get_db_connection()
     query = "SELECT seatRow, seatColumn from reservations"
@@ -63,13 +63,17 @@ def get_seating_chart():
     columns = 4
 
     chart = [['O' for _ in range(columns)] for _ in range(rows)]
+    seating_dict = {}
 
     for seat in seats:
         row = seat['seatRow']
         column = seat['seatColumn']
         chart[row][column] = 'X'
+        if row not in seating_dict:
+            seating_dict[row] = []
+        seating_dict[row].append(column)
 
-    return chart
+    return chart, seating_dict
 
 #function to get reservation code
 def get_reservation_code(first_name):
@@ -111,7 +115,7 @@ def admin():
     #will then display a reservation code one reservation is made
 @app.route('/reservation', methods=('GET', 'POST'))
 def reservation():
-    seating_chart = get_seating_chart()
+    seating_chart, seating_dict = get_seating_chart()
     first_name = None
     last_name = None
     seat_row = None
@@ -139,21 +143,33 @@ def reservation():
         if not seat_column:
             flash('ERROR: Must select a seat')
 
+        #convert seat row/column to int and subtract 1 to align with database
+        db_seat_row = int(seat_row) - 1
+        db_seat_column = int(seat_column) - 1
+
+        #check to make sure seat is not already reserved 
+        if db_seat_row in seating_dict and db_seat_column in seating_dict[db_seat_row]:
+            flash(f'ERROR: Row: {seat_row}, Seat: {seat_column} is already assigned. Choose again.')
+            return redirect(url_for('reservation'))
+
         #make reservation code, combination of first name and infotc4320, alternating letters
-        #****Fix this - if one string is longer, does not finish longer string
         reservation_code = get_reservation_code(first_name)        
 
 
         #add reservation to the database
         conn = get_db_connection()
-        conn.execute('INSERT INTO reservations (passengerName, seatRow, seatColumn, eTicketNumber) VALUES (?, ?, ?, ?)', (first_name, seat_row , seat_column, reservation_code))
+        conn.execute('INSERT INTO reservations (passengerName, seatRow, seatColumn, eTicketNumber) VALUES (?, ?, ?, ?)', (first_name, db_seat_row, db_seat_column, reservation_code))
         conn.commit()
         conn.close()
+
+        #get seating chart again so that it updates when new reservation is made
+        seating_chart, seating_dict = get_seating_chart()
         
 
     return render_template('reservation.html', seating_chart=seating_chart, first_name=first_name, reservation_code=reservation_code, seat_row=seat_row, seat_column=seat_column)
 
- 
+
+ #Homepage route
 @app.route('/', methods=('GET', 'POST'))
 def index():
     choice = request.form.get('user_choice')
@@ -164,9 +180,9 @@ def index():
             return(redirect(url_for('index')))
         
         if choice == "admin":
-            return render_template('admin.html')
+            return redirect(url_for('admin'))
         if choice == "reservation":
-            return render_template('reservation.html')
+            return redirect(url_for('reservation'))
         else:
             return redirect((url_for('index')))
     return render_template('index.html')
