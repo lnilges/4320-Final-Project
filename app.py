@@ -44,9 +44,47 @@ def get_db_connection():
     #return the connection object
     return conn
 
-#function to get admin login information from database
-def admin_info():
-    pass
+
+#Funtion to display admin page requirements after login
+def display_admin_dashboard():
+    db = get_db_connection()
+    cur = db.cursor()
+
+    cur.execute("SELECT id, passengerName, seatRow, seatColumn, eTicketNumber FROM reservations")
+    reservations = [
+        {
+            "id": r["id"],
+            "name": r["passengerName"],
+            "row": r["seatRow"] + 1,       
+            "seat": r["seatColumn"] + 1,  
+            "confirmation": r["eTicketNumber"]
+        }
+        for r in cur.fetchall()
+    ]
+
+    seating_chart, _ = get_seating_chart()
+
+    cost_matrix = get_cost_matrix()
+    total_sales = 0
+    for r in reservations:
+        total_sales += cost_matrix[r["row"] - 1][r["seat"] - 1]
+
+    return render_template(
+        "admin.html",
+        logged_in=True,
+        seating_chart=seating_chart,
+        reservations=reservations,
+        total_sales=total_sales
+    )
+
+# Function to delete reservations
+@app.route("/admin/delete/<int:res_id>", methods=["POST"])
+def delete_reservation(res_id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM reservations WHERE id=?", (res_id,))
+    conn.commit()
+    return display_admin_dashboard()
 
 #function to get reservation information from database
 def get_reservations():
@@ -108,7 +146,26 @@ def get_cost_matrix():
     #will display seating chart, total sales, and reservation list with delete button
 @app.route('/admin', methods=('GET', 'POST'))
 def admin():
-   return render_template('admin.html')
+    conn = get_db_connection()
+
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        result = conn.execute(
+            "SELECT * FROM admins WHERE username=? AND password=?",
+            (username, password)
+        ).fetchone()
+
+        conn.close()
+
+        if result:
+            return display_admin_dashboard()
+        else:
+            return render_template("admin.html", error="Invalid login credentials.", logged_in=False)
+
+    return render_template("admin.html", logged_in=False)
+
 
 #route to get to reservations page
     #will have a form where users can enter first name, last name, seat row, and seat column
