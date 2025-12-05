@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Reserve Your Seat</h1>
+    <hr>
+    <!--Displays reservation success message once user successfully makes reservation-->
+    {% if reservation_code %}
+        <p>Congratulations {{ first_name }}! Row: {{ seat_row }}, Seat: {{ seat_column }} is now reserved for you. Enjoy your trip!</p>
+        <p>Your eTicket number is: {{ reservation_code }}</p>
+    {% endif %}
+
+    <!--Displays flight chart-->
+    <h2>Seating Chart</h2>
+    <p>X = Reserved Seat : O = Available Seat</p>
+    <div class="card">
+        {% for row in seating_chart %}
+            <div>{{ row }}</div>
+        {% endfor %}
+    </div>
+
+    <br><br><br>
+    <!--Form to make airline reservation-->
+    <form method="POST" action="{{ url_for('reservation')}} ">
+        <label for="first_name">First Name</label>
+        <br>
+        <input id="first_name" name="first_name" required>
+        <br><br>
+        <label for="last_name">Last Name</label>
+        <br>
+        <input id="last_name" name="last_name" required>
+        <br><br>
+        <label for="seat_row">Select a Row</label>
+        <br>
+        <select id="seat_row" name="seat_row" required>
+            <option disabled selected value>Select a Row</option>
+            {% for i in range(1, 13) %}
+                <option>{{ i }}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+        <label for="seat_column">Select a Seat</label>
+        <br>
+        <select id="seat_column" name="seat_column" required>
+            <option disabled selected value>Select a Seat</option>
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+        </select>
+        <br><br>
+        <button type="submit">Submit</button>
+    </form>
+
+
+{% endblock %}

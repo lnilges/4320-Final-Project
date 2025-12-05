@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTL-8">
+    <title>{% block title %} Home {% endblock %} - Stock Data Visualizer</title>
+    <style>
+        .alert {
+            padding: 20px;
+            margin: 5px;
+            color: #970020;
+            background-color: #ffd5de;
+        }
+
+        .content {
+            background-color: white;
+            width: 70%;
+            border: 2px black;
+            padding: 10px;
+            margin: auto;
+        }
+
+        body {
+            background-color: rgb(182, 212, 222);
+            justify-content: center;
+        }
+
+        .post {
+            padding: 10px;
+            margin: 5px;
+            background-color: #f3f3f3
+        }
+
+        h1 {
+            text-align: center;
+            padding: auto;
+        }
+
+        nav a {
+            color: #d64161;
+            font-size: 2em;
+            margin-left: 50px;
+            text-decoration: none;
+        }
+
+        .card {
+            background-color: rgb(192, 192, 192);
+            width: 25%;
+            box-sizing: border-box;
+            border-radius: 15px;
+            padding: 17px;
+            content: center;
+        }
+
+        h2 {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('admin') }}">Admin</a>
+        <a href="{{ url_for('reservation') }}">Reservations</a>
+    </nav>
+    <hr>
+    <div class="content">
+        {% for message in get_flashed_messages() %}
+            <div class="alert">{{ message }}</div>
+        {% endfor %}
+
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
