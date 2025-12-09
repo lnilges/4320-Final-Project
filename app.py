@@ -24,7 +24,7 @@
  
 
 import flask 
-from flask import Flask, render_template, request, url_for, flash, redirect 
+from flask import Flask, render_template, request, url_for, flash, redirect, session
 import sqlite3
  
 
@@ -84,7 +84,12 @@ def delete_reservation(res_id):
     cur = conn.cursor()
     cur.execute("DELETE FROM reservations WHERE id=?", (res_id,))
     conn.commit()
-    return display_admin_dashboard()
+    conn.close()
+
+    # Log admin out after deletion
+    session.clear()
+    flash("Reservation deleted. You have been logged out.")
+    return redirect(url_for("admin"))
 
 #function to get reservation information from database
 def get_reservations():
